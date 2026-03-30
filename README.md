@@ -1,3 +1,5 @@
+# Homework
+
 ## Описание
 Проект для изучения основ объектно-ориентированного программирования на Python.
 Реализованы классы `Product` и `Category` для интернет-магазина.
@@ -16,7 +18,7 @@
 ### Установка
 ```bash
 # Клонируйте репозиторий
-git clone <url-репозитория>
+git clone https://github.com/annakuksofficial-ops/homework_oop.git
 
 # Установите зависимости
 poetry install
