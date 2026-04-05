@@ -170,3 +170,56 @@ class TestCategory:
 
         assert category.name == "Test Name"
         assert category.description == "Test Desc"
+
+
+class TestProductMagicMethods:
+    """Тесты для магических методов Product"""
+
+    def test_product_str(self):
+        """Тест строкового представления продукта"""
+        product = Product("Test Product", "Description", 100.50, 5)
+        expected = "Test Product, 100.5 руб. Остаток: 5 шт."
+        assert str(product) == expected
+
+    def test_product_add(self):
+        """Тест сложения двух продуктов"""
+        product1 = Product("Product A", "Desc", 100.0, 10)
+        product2 = Product("Product B", "Desc", 200.0, 2)
+        result = product1 + product2
+        expected = (100 * 10) + (200 * 2)  # 1000 + 400 = 1400
+        assert result == expected
+
+    def test_product_add_different_types(self):
+        """Тест сложения продукта с не-продуктом (должен вызвать ошибку)"""
+        product = Product("Test", "Desc", 100.0, 5)
+        try:
+            result = product + 100
+            assert False, "Должна быть ошибка TypeError"
+        except TypeError as e:
+            assert str(e) == "Можно складывать только объекты Product"
+
+
+class TestCategoryMagicMethods:
+    """Тесты для магических методов Category"""
+
+    def test_category_str(self):
+        """Тест строкового представления категории"""
+        product1 = Product("Product 1", "Desc", 100.0, 5)
+        product2 = Product("Product 2", "Desc", 200.0, 3)
+        category = Category("Test Category", "Description", [product1, product2])
+
+        expected = "Test Category, количество продуктов: 8 шт."
+        assert str(category) == expected
+
+    def test_category_str_empty(self):
+        """Тест строкового представления пустой категории"""
+        category = Category("Empty Category", "No products", [])
+        expected = "Empty Category, количество продуктов: 0 шт."
+        assert str(category) == expected
+
+    def test_category_str_with_one_product(self):
+        """Тест строкового представления категории с одним продуктом"""
+        product = Product("Single Product", "Desc", 100.0, 7)
+        category = Category("Single Cat", "Desc", [product])
+        expected = "Single Cat, количество продуктов: 7 шт."
+        assert str(category) == expected
