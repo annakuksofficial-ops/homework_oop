@@ -23,6 +23,43 @@ class TestProduct:
         product = Product("Out of Stock", "Description", 100.0, 0)
         assert product.quantity == 0
 
+    def test_price_setter_positive(self):
+        """Тест сеттера цены с положительным значением"""
+        product = Product("Test", "Desc", 100.0, 5)
+        product.price = 200.0
+        assert product.price == 200.0
+
+    def test_price_setter_negative(self, capsys):
+        """Тест сеттера цены с отрицательным значением (цена не меняется)"""
+        product = Product("Test", "Desc", 100.0, 5)
+        product.price = -50.0
+        captured = capsys.readouterr()
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
+        assert product.price == 100.0
+
+    def test_price_setter_zero(self, capsys):
+        """Тест сеттера цены с нулевым значением (цена не меняется)"""
+        product = Product("Test", "Desc", 100.0, 5)
+        product.price = 0
+        captured = capsys.readouterr()
+        assert "Цена не должна быть нулевая или отрицательная" in captured.out
+        assert product.price == 100.0
+
+    def test_new_product_classmethod(self):
+        """Тест класс-метода new_product"""
+        product_dict = {
+            "name": "Phone",
+            "description": "Smartphone",
+            "price": 500.0,
+            "quantity": 10,
+        }
+        product = Product.new_product(product_dict)
+
+        assert product.name == "Phone"
+        assert product.description == "Smartphone"
+        assert product.price == 500.0
+        assert product.quantity == 10
+
 
 class TestCategory:
     """Тесты для класса Category"""
@@ -37,8 +74,50 @@ class TestCategory:
 
         assert category.name == "Test Category"
         assert category.description == "Test Description"
-        assert len(category.products) == 2
-        assert category.products == products
+        assert Category.category_count > 0
+
+    def test_products_getter_returns_string(self):
+        """Тест геттера products - возвращает строку"""
+        product = Product("Test Product", "Desc", 100.0, 5)
+        category = Category("Test Category", "Test Desc", [product])
+
+        result = category.products
+        assert isinstance(result, str)
+        assert "Test Product" in result
+        assert "100.0 руб." in result
+        assert "Остаток: 5 шт." in result
+
+    def test_products_getter_format(self):
+        """Тест формата вывода геттера products"""
+        product = Product("Laptop", "Powerful laptop", 1500.0, 3)
+        category = Category("Electronics", "Devices", [product])
+
+        expected = "Laptop, 1500.0 руб. Остаток: 3 шт.\n"
+        assert category.products == expected
+
+    def test_add_product(self):
+        """Тест метода add_product"""
+        category = Category("Test Category", "Desc", [])
+        product = Product("New Product", "Desc", 100.0, 5)
+
+        initial_count = Category.product_count
+        category.add_product(product)
+
+        assert "New Product" in category.products
+        assert Category.product_count == initial_count + 1
+
+    def test_add_product_multiple(self):
+        """Тест добавления нескольких продуктов"""
+        category = Category("Test Category", "Desc", [])
+
+        product1 = Product("P1", "D1", 100, 2)
+        product2 = Product("P2", "D2", 200, 3)
+
+        category.add_product(product1)
+        category.add_product(product2)
+
+        assert "P1" in category.products
+        assert "P2" in category.products
 
     def test_category_count_increment(self):
         """Тест подсчета количества категорий"""
@@ -81,7 +160,7 @@ class TestCategory:
 
         category = Category("Empty Category", "No products", [])
 
-        assert len(category.products) == 0
+        assert category.products == ""
         assert Category.product_count == initial_prod_count
 
     def test_category_attributes(self):
@@ -91,4 +170,3 @@ class TestCategory:
 
         assert category.name == "Test Name"
         assert category.description == "Test Desc"
-        assert category.products == products
