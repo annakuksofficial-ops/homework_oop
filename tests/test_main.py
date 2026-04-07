@@ -1,4 +1,5 @@
-from src.main import Category, Product
+import pytest
+from src.main import Category, Product, Smartphone, LawnGrass
 
 
 class TestProduct:
@@ -193,10 +194,10 @@ class TestProductMagicMethods:
         """Тест сложения продукта с не-продуктом (должен вызвать ошибку)"""
         product = Product("Test", "Desc", 100.0, 5)
         try:
-            result = product + 100
+            product + 100
             assert False, "Должна быть ошибка TypeError"
         except TypeError as e:
-            assert str(e) == "Можно складывать только объекты Product"
+            assert str(e) == "Можно складывать только одинаковые типы товаров"
 
 
 class TestCategoryMagicMethods:
@@ -223,3 +224,122 @@ class TestCategoryMagicMethods:
         category = Category("Single Cat", "Desc", [product])
         expected = "Single Cat, количество продуктов: 7 шт."
         assert str(category) == expected
+
+
+class TestSmartphone:
+    """Тесты для класса Smartphone"""
+
+    def test_smartphone_initialization(self):
+        """Тест создания смартфона"""
+        phone = Smartphone("iPhone 15", "Apple phone",
+                           100000.0, 10, 98.5,
+                           "15 Pro", 256, "Black")
+        assert phone.name == "iPhone 15"
+        assert phone.description == "Apple phone"
+        assert phone.price == 100000.0
+        assert phone.quantity == 10
+        assert phone.efficiency == 98.5
+        assert phone.model == "15 Pro"
+        assert phone.memory == 256
+        assert phone.color == "Black"
+
+    def test_smartphone_inherits_from_product(self):
+        """Тест: Smartphone наследуется от Product"""
+        phone = Smartphone("Test", "Desc", 100.0,
+                           5, 90.0, "Model",
+                           128, "Red")
+        assert isinstance(phone, Product)
+
+    def test_smartphone_str(self):
+        """Тест строкового представления смартфона"""
+        phone = Smartphone("Samsung", "Desc",
+                           50000.0, 3, 95.0,
+                           "S23", 256, "Gray")
+        expected = "Samsung, 50000.0 руб. Остаток: 3 шт."
+        assert str(phone) == expected
+
+
+class TestLawnGrass:
+    """Тесты для класса LawnGrass"""
+
+    def test_lawn_grass_initialization(self):
+        """Тест создания газонной травы"""
+        grass = LawnGrass("Газонная трава", "Элитная трава",
+                          500.0, 20, "Россия",
+                          "7 дней", "Зеленый")
+        assert grass.name == "Газонная трава"
+        assert grass.description == "Элитная трава"
+        assert grass.price == 500.0
+        assert grass.quantity == 20
+        assert grass.country == "Россия"
+        assert grass.germination_period == "7 дней"
+        assert grass.color == "Зеленый"
+
+    def test_lawn_grass_inherits_from_product(self):
+        """Тест: LawnGrass наследуется от Product"""
+        grass = LawnGrass("Test", "Desc",
+                          100.0, 5, "USA",
+                          "5 days", "Green")
+        assert isinstance(grass, Product)
+
+    def test_lawn_grass_str(self):
+        """Тест строкового представления газонной травы"""
+        grass = LawnGrass("Grass", "Desc",
+                          300.0, 10,
+                          "Russia", "7d",
+                          "Green")
+        expected = "Grass, 300.0 руб. Остаток: 10 шт."
+        assert str(grass) == expected
+
+
+class TestTypeRestrictions:
+    """Тесты для ограничений"""
+
+    def test_cannot_add_smartphone_and_grass(self):
+        """Тест: нельзя сложить смартфон и траву"""
+        phone = Smartphone("Phone", "Desc",
+                           1000.0, 10, 95.0,
+                           "Model", 128, "Red")
+        grass = LawnGrass("Grass", "Desc",
+                          500.0, 20, "RU",
+                          "7d", "Green")
+
+        with pytest.raises(TypeError) as exc_info:
+            phone + grass
+        assert "Можно складывать только одинаковые типы товаров" in str(exc_info.value)
+
+    def test_cannot_add_product_to_category_wrong_type(self):
+        """Тест: нельзя добавить в категорию не продукт"""
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(TypeError) as exc_info:
+            category.add_product("not a product")
+        assert ("Можно добавлять только объекты Product или его наследников"
+                in str(exc_info.value))
+
+    def test_cannot_add_integer_to_category(self):
+        """Тест: нельзя добавить число в категорию"""
+        category = Category("Test", "Desc", [])
+
+        with pytest.raises(TypeError):
+            category.add_product(123)
+
+    def test_can_add_smartphone_to_category(self):
+        """Тест: можно добавить смартфон в категорию"""
+        category = Category("Phones", "Desc", [])
+        phone = Smartphone("iPhone", "Desc", 1000.0,
+                           10, 95.0, "15",
+                           256, "Black")
+
+        category.add_product(phone)
+        assert "iPhone" in category.products
+
+    def test_can_add_lawn_grass_to_category(self):
+        """Тест: можно добавить траву в категорию"""
+        category = Category("Grass", "Desc", [])
+        grass = LawnGrass("Green Grass", "Desc",
+                          500.0, 20, "Russia",
+                          "7d", "Green")
+
+        category.add_product(grass)
+        assert "Green Grass" in category.products

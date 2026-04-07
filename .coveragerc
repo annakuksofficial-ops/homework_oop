@@ -1,0 +1,6 @@
+[run]
+omit = */__main__*
+
+[report]
+exclude_lines =
+    if __name__ == .__main__.:

@@ -7,9 +7,16 @@
 ## Функциональность
 - Класс `Product` с атрибутами: name, description, price, quantity
 - Класс `Category` с атрибутами: name, description, products
-- Автоматический подсчет количества категорий и товаров (category_count, product_count)
+- Классы-наследники: Smartphone, LawnGrass
+- Подсчёт общей стоимости товаров на складе (магический метод __add__)
+- Проверка типов при сложении товаров
 
+## Тестирование
+```bash
+pytest tests/ -v
+```
 ## Установка и запуск
+python src/main.py
 
 ### Требования
 - Python 3.12+
@@ -22,3 +29,4 @@ git clone https://github.com/annakuksofficial-ops/homework_oop.git
 
 # Установите зависимости
 poetry install
+```
