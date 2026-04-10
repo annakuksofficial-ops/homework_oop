@@ -1,5 +1,5 @@
 import pytest
-from src.main import Category, Product, Smartphone, LawnGrass
+from src.main import Category, Product, Smartphone, LawnGrass, BaseProduct
 
 
 class TestProduct:
@@ -343,3 +343,21 @@ class TestTypeRestrictions:
 
         category.add_product(grass)
         assert "Green Grass" in category.products
+
+class TestBaseProduct:
+    """Тесты для абстрактного класса BaseProduct"""
+
+    def test_base_product_is_abstract(self):
+        """Тест: нельзя создать экземпляр BaseProduct"""
+        with pytest.raises(TypeError):
+            BaseProduct("test", "desc", 100, 5)
+
+
+class TestLogMixin:
+    """Тесты для миксина логирования"""
+
+    def test_log_mixin_output(self, capsys):
+        """Тест: при создании продукта выводится сообщение"""
+        product = Product("Test", "Desc", 100, 5)
+        captured = capsys.readouterr()
+        assert "Создан объект класса Product с параметрами:" in captured.out

@@ -1,4 +1,25 @@
-class Product:
+from abc import ABC, abstractmethod
+
+
+class BaseProduct(ABC):
+    """Абстрактный базовый класс для всех продуктов"""
+
+    @abstractmethod
+    def __str__(self):
+        pass
+
+    @abstractmethod
+    def __add__(self, other):
+        pass
+
+
+class LogMixin:
+    """Миксин для логирования создания объектов"""
+
+    def __init__(self, *args, **kwargs):
+        print(f"Создан объект класса {self.__class__.__name__} с параметрами: {args}")
+
+class Product(LogMixin, BaseProduct):
     """Класс для представления продукта"""
 
     def __init__(self, name: str, description: str,
@@ -8,6 +29,7 @@ class Product:
         self.description = description
         self.__price = price
         self.quantity = quantity
+        LogMixin.__init__(self, name, description, price, quantity)
 
     @classmethod
     def new_product(cls, product_dict: dict):
