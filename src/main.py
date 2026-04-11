@@ -19,12 +19,15 @@ class LogMixin:
     def __init__(self, *args, **kwargs):
         print(f"Создан объект класса {self.__class__.__name__} с параметрами: {args}")
 
+
 class Product(LogMixin, BaseProduct):
     """Класс для представления продукта"""
 
     def __init__(self, name: str, description: str,
                  price: float, quantity: int):
         """Инициализация продукта"""
+        if quantity == 0:
+            raise ValueError("Товар с нулевым количеством не может быть добавлен")
         self.name = name
         self.description = description
         self.__price = price
@@ -110,6 +113,26 @@ class Category:
                             "объекты Product или его наследников")
         self.__products.append(product)
         Category.product_count += 1
+
+        def middle_price(self):
+            """Возвращает среднюю цену всех товаров в категории"""
+            try:
+                total_price = 0
+                for product in self.__products:
+                    total_price += product.price
+                return total_price / len(self.__products)
+            except ZeroDivisionError:
+                return 0
+
+    def middle_price(self):
+        """Возвращает среднюю цену всех товаров в категории"""
+        try:
+            total_price = 0
+            for product in self.__products:
+                total_price += product.price
+            return total_price / len(self.__products)
+        except ZeroDivisionError:
+            return 0
 
     @property
     def products(self):

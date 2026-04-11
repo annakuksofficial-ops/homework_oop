@@ -1,5 +1,6 @@
 import pytest
-from src.main import Category, Product, Smartphone, LawnGrass, BaseProduct
+
+from src.main import BaseProduct, Category, LawnGrass, Product, Smartphone
 
 
 class TestProduct:
@@ -20,9 +21,10 @@ class TestProduct:
         assert product.price == 0.0
 
     def test_product_with_zero_quantity(self):
-        """Тест продукта с нулевым количеством"""
-        product = Product("Out of Stock", "Description", 100.0, 0)
-        assert product.quantity == 0
+        """Тест: создание продукта с нулевым количеством вызывает ошибку"""
+        with pytest.raises(ValueError, match="Товар с нулевым "
+                                             "количеством не может быть добавлен"):
+            Product("Out of Stock", "Description", 100.0, 0)
 
     def test_price_setter_positive(self):
         """Тест сеттера цены с положительным значением"""
@@ -344,6 +346,7 @@ class TestTypeRestrictions:
         category.add_product(grass)
         assert "Green Grass" in category.products
 
+
 class TestBaseProduct:
     """Тесты для абстрактного класса BaseProduct"""
 
@@ -358,6 +361,40 @@ class TestLogMixin:
 
     def test_log_mixin_output(self, capsys):
         """Тест: при создании продукта выводится сообщение"""
-        product = Product("Test", "Desc", 100, 5)
+        Product("Test", "Desc", 100, 5)
         captured = capsys.readouterr()
         assert "Создан объект класса Product с параметрами:" in captured.out
+
+
+class TestProductExceptions:
+    """Тесты для исключений Product"""
+
+    def test_product_zero_quantity_raises_error(self):
+        """Тест: создание продукта с quantity=0 вызывает ValueError"""
+        with pytest.raises(ValueError, match="Товар "
+                                             "с нулевым количеством "
+                                             "не может быть добавлен"):
+            Product("Test", "Desc", 100.0, 0)
+
+
+class TestCategoryMiddlePrice:
+    """Тесты для метода middle_price"""
+
+    def test_middle_price_normal(self):
+        """Тест: средняя цена для категории с продуктами"""
+        p1 = Product("P1", "Desc", 100.0, 5)
+        p2 = Product("P2", "Desc", 200.0, 3)
+        p3 = Product("P3", "Desc", 300.0, 2)
+        category = Category("Test", "Desc", [p1, p2, p3])
+        assert category.middle_price() == 200.0  # (100+200+300)/3 = 200
+
+    def test_middle_price_empty_category(self):
+        """Тест: средняя цена для пустой категории возвращает 0"""
+        category = Category("Empty", "Desc", [])
+        assert category.middle_price() == 0
+
+    def test_middle_price_one_product(self):
+        """Тест: средняя цена для категории с одним продуктом"""
+        p1 = Product("P1", "Desc", 100.0, 5)
+        category = Category("Test", "Desc", [p1])
+        assert category.middle_price() == 100.0
